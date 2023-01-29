@@ -98,5 +98,4 @@ pool mem_pool;
 pool swap_pool;
 task_q task_pool;
 
-pthread_mutex_t mutex_m;
 pthread_mutex_t mutex_q;

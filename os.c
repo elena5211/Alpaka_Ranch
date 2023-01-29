@@ -20,6 +20,20 @@ int swap(table* my_table) {
 void allocator(task my_task) {
     //OS thread uses this function
     //This function checks task type and calls alloc function
+    //This function must handle following three types of tasks
+    //task type 0: new allocation is needed
+    //task type 1: access page in swap space
+    //task type 2: deallocation of finished thread
+
+    if(my_task.type==0){
+
+    }
+    else if(my_task.type == 1){
+
+    }
+    else if(my_task.type == 2){
+        
+    }
     return;
 }
 
@@ -53,7 +67,7 @@ void classify_task(table* my_table, int VPN) {
         }
         //next week ends
     }
-    //task type 2: allocation is needed
+    //task type 0: allocation is needed
     else{
         pthread_mutex_lock(&mutex_q);
         task new_task;

@@ -36,9 +36,13 @@ void* p_main(void* new_table){
             }
         }
     }
-    pthread_mutex_lock(&mutex_m);
-    dealloc_page(my_table, &mem_pool, &swap_pool);
-    pthread_mutex_unlock(&mutex_m);
+    sleep(10);
+    task dealloc_task;
+    dealloc_task.my_table = new_table;
+    dealloc_task.type = 2;
+    dealloc_task.VPN = -1;
+    add_task(&task_pool, dealloc_task);
+    pthread_cond_wait(&my_table->my_cond, &mutex_q);
     return NULL;
 }
 
@@ -48,6 +52,7 @@ void* os_main(){
             pthread_mutex_lock(&mutex_q);
             task task = get_task(&task_pool);
             allocator(task);
+            //Attention here!! following function wake up sleeping thread
             pthread_cond_signal(&task.my_table->my_cond);
             pthread_mutex_unlock(&mutex_q);
         }
@@ -79,9 +84,8 @@ int main(int argc, char* argv[]) {
     }
     pool_init(&mem_pool, NUMPAGE);
     pool_init(&swap_pool, 1048576*10);
-    task_q_init(&task_pool, 10000000);
+    task_q_init(&task_pool, RAND_MAX);
 
-    pthread_mutex_init(&mutex_m, NULL);
     pthread_mutex_init(&mutex_q, NULL);
     
     pthread_t pthread[proc_num];
@@ -103,10 +107,9 @@ int main(int argc, char* argv[]) {
         pthread_join(pthread[i], NULL);
     }
     off=1;
-    pthread_mutex_destroy(&mutex_m);
+    pthread_mutex_destroy(&mutex_q);
     printf("%d process finished\n", proc_num);
     printf("num of write %d\n", num_write);
     printf("evict counter %d\n", evict_ctr);
     printf("percent %lf\n", (double)evict_ctr/num_write * 100);
-
 }
