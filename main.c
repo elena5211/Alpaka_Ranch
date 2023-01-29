@@ -37,12 +37,14 @@ void* p_main(void* new_table){
         }
     }
     sleep(10);
+    pthread_mutex_lock(&mutex_q);
     task dealloc_task;
     dealloc_task.my_table = new_table;
     dealloc_task.type = 2;
     dealloc_task.VPN = -1;
     add_task(&task_pool, dealloc_task);
     pthread_cond_wait(&my_table->my_cond, &mutex_q);
+    pthread_mutex_unlock(&mutex_q);
     return NULL;
 }
 
